@@ -35,6 +35,10 @@ struct Article:Codable{
         
         return URL(string: urlToImage)
     }
+    
+    var articleUrl:URL{
+        URL(string: url)!
+    }
 }
 
 extension Article:Identifiable{

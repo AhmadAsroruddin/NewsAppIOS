@@ -9,15 +9,24 @@ import SwiftUI
 
 struct ArticleListView: View {
     let articles:[Article]
+    @State private var selectedArticle: Article?
+    let webViewPresenter = WebViewPresenter()
+    
     var body: some View {
         List{
             ForEach(articles) { article in
                 ArticleView(article: article)
+                    .onTapGesture {
+                        selectedArticle = article
+                    }
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowSeparator(.hidden)
         }
         .listStyle(.plain)
+        .sheet(item: $selectedArticle){article in
+            webViewPresenter.presentWebView(url: article.articleUrl)
+        }
     }
 }
 

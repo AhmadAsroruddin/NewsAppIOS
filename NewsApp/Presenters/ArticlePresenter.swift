@@ -11,10 +11,20 @@ enum DataPhase<T>{
     case empty
     case success(T)
     case error(Error)
+    case fetchingNextPage(T)
+    var value: T?{
+        if case .success(let value) = self{
+            return value
+        } else if case .fetchingNextPage(let value) = self {
+            return value
+        } else {
+            return nil
+        }
+    }
 }
 
 protocol ArticlePresenterProtocol{
-    func loadArticle() async
+    func loadFirstPage() async
     func searchArticle() async
 }
 
@@ -25,6 +35,19 @@ class ArticlePresenter: ArticlePresenterProtocol, ObservableObject{
     @Published var selectedCategory: Category
     @Published var searchQuery = ""
     private let articleInteractor = ArticleInteraction.shared
+    private let pagingData = PagingModel(itemsPerPage: 5, maxPageLimit: 500)
+    
+    var articles:[Article]{
+        return phase.value ?? []
+    }
+    
+    var isFetchingNextPage: Bool {
+        if case .fetchingNextPage = phase {
+            return true
+        }
+        
+        return false
+    }
     
     init(articles: [Article]?=nil, selectedCategory: Category = .general){
         if let articles = articles{
@@ -35,10 +58,13 @@ class ArticlePresenter: ArticlePresenterProtocol, ObservableObject{
         self.selectedCategory = selectedCategory
     }
     
-    func loadArticle()async{
+    func loadFirstPage()async{
         phase = .empty
         do{
-            let articles = try await articleInteractor.fetchNews(from: selectedCategory)
+            await pagingData.reset()
+            
+            let articles = try await pagingData.loadNextPage(dataFetchProvider: loadArticle(page:))
+            if Task.isCancelled{return}
             phase = .success(articles)
         } catch{
             phase = .error(error)
@@ -46,6 +72,26 @@ class ArticlePresenter: ArticlePresenterProtocol, ObservableObject{
         
     }
     
+    func loadNextPage()async{
+        if Task.isCancelled {return}
+        
+        let articles = self.phase.value ?? []
+        phase = .fetchingNextPage(articles)
+        
+        do{
+            let nextArticle = try await pagingData.loadNextPage(dataFetchProvider: loadArticle(page:))
+            phase = .success(articles + nextArticle)
+        } catch {
+            phase = .error(error)
+        }
+    }
+    
+    private func loadArticle(page: Int) async throws -> [Article]{
+        let articles = try await articleInteractor.fetchNews(
+            from: selectedCategory, pageSize: pagingData.itemsPerPage, page: page)
+        
+        return articles
+    }
     
     func searchArticle()async{
         let searchQuery = self.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines)

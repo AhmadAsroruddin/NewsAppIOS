@@ -12,16 +12,16 @@ struct ArticleTabView: View {
     
     var body: some View {
         NavigationStack{
-            ArticleListView(articles: articles)
+            ArticleListView(articles: articlePresenter.articles, isFetching: articlePresenter.isFetchingNextPage, nextPageHandler: {await articlePresenter.loadNextPage()})
                 .overlay(overlayView)
                 .refreshable {
                     Task{
-                        await articlePresenter.loadArticle()
+                        await articlePresenter.loadFirstPage()
                     }
                 }
                 .onAppear{
                     Task{
-                        await articlePresenter.loadArticle()
+                        await articlePresenter.loadFirstPage()
                     }
                 }
             
@@ -33,7 +33,7 @@ struct ArticleTabView: View {
                 }
                 .onChange(of: articlePresenter.selectedCategory){_ in
                     Task{
-                        await articlePresenter.loadArticle()
+                        await articlePresenter.loadFirstPage()
                     }
                 }
         }
@@ -45,24 +45,16 @@ struct ArticleTabView: View {
         case .empty:
             ProgressView()
         case .success(let articles) where articles.isEmpty:
-            EmptyNewsView(text: "No Articles")
+            EmptyNewsView(text: "No")
         case .error(let error):
             RetryView(text: error.localizedDescription){
                 Task{
-                    await articlePresenter.loadArticle()
+                    await articlePresenter.loadFirstPage()
                 }
             }
         default:
             EmptyView()
             
-        }
-    }
-    
-    private var articles: [Article]{
-        if case let .success(articles) = articlePresenter.phase{
-            return articles
-        } else {
-            return []
         }
     }
     

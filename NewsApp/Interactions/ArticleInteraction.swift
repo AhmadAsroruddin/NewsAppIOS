@@ -21,12 +21,12 @@ struct ArticleInteraction{
         return decoder
     }()
     
-    func fetchNews(from category: Category? = nil, query: String? = nil) async throws -> [Article] {
+    func fetchNews(from category: Category? = nil, query: String? = nil, pageSize: Int=5, page: Int=1) async throws -> [Article] {
         let url: URL
         if let category = category {
-            url = generateNewsUrl(from: category)
+            url = generateNewsUrl(from: category, pageSize: pageSize, page: page)
         } else if let query = query {
-            url = generateSearchUrl(from: query)
+            url = generateSearchUrl(from: query, pageSize: pageSize, page: page)
         } else {
             throw generateError(description: "error")
         }
@@ -51,26 +51,20 @@ struct ArticleInteraction{
     }
 
     
-    private func generateError(code: Int = 1, description: String) -> Error{
+    private func generateError(code: Int = 1, description: String ) -> Error{
         NSError(domain: "NewsAPI", code: code, userInfo: [NSLocalizedDescriptionKey: description])
     }
     
-    private func generateSearchUrl(from query: String) -> URL{
+    private func generateSearchUrl(from query: String, pageSize: Int=5, page: Int=1) -> URL{
         let queryFormatting = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         
-        var url = "https://newsapi.org/v2/everything?"
-        url += "apiKey=\(apiKey)"
-        url += "&language=en"
-        url += "&q=\(queryFormatting)"
+        let url = "https://newsapi.org/v2/everything?apiKey=\(apiKey)&language=en&q=\(queryFormatting)&page=\(page)&pageSize=\(pageSize)"
         
         return URL(string: url)!
     }
     
-    private func generateNewsUrl(from category: Category) -> URL {
-        var url = "https://newsapi.org/v2/top-headlines?"
-        url += "apiKey=\(apiKey)"
-        url += "&language=en"
-        url += "&category=\(category.rawValue)"
+    private func generateNewsUrl(from category: Category, pageSize: Int=5, page: Int=1) -> URL {
+        let url = "https://newsapi.org/v2/top-headlines?apiKey=\(apiKey)&language=en&category=\(category.rawValue)&page=\(page)&pageSize=\(pageSize)"
         return URL(string: url)!
     }
 }

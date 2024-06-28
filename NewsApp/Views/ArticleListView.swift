@@ -11,14 +11,36 @@ struct ArticleListView: View {
     let articles:[Article]
     @State private var selectedArticle: Article?
     let webViewPresenter = WebViewPresenter()
+    var isFetching = false
+    var nextPageHandler: (() async -> ())? = nil
     
     var body: some View {
         List{
             ForEach(articles) { article in
-                ArticleView(article: article)
-                    .onTapGesture {
-                        selectedArticle = article
+                
+                if let nextPageHandler = nextPageHandler, article == articles.last{
+                    ArticleView(article: article)
+                        .onTapGesture {
+                            selectedArticle = article
+                        }
+                        .task {
+                            await nextPageHandler()
+                        }
+                    if isFetching{
+                        HStack{
+                            Spacer()
+                            ProgressView()
+                            Spacer()
+                        }
                     }
+                } else{
+                    ArticleView(article: article)
+                        .onTapGesture {
+                            selectedArticle = article
+                        }
+                }
+                
+               
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowSeparator(.hidden)

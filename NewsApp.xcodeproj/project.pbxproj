@@ -88,7 +88,7 @@
 			children = (
 				72E86FA22C2FA06F0016F879 /* Router */,
 				72E86F9F2C2E9B100016F879 /* Constants */,
-				72E86F8F2C2D62BF0016F879 /* Interactions */,
+				72E86F8F2C2D62BF0016F879 /* Interactor */,
 				72E86F892C2D4AE20016F879 /* Presenters */,
 				72E86F822C2D15F00016F879 /* Info.plist */,
 				72E86F7D2C2D07420016F879 /* Views */,
@@ -144,12 +144,12 @@
 			path = Presenters;
 			sourceTree = "<group>";
 		};
-		72E86F8F2C2D62BF0016F879 /* Interactions */ = {
+		72E86F8F2C2D62BF0016F879 /* Interactor */ = {
 			isa = PBXGroup;
 			children = (
 				72E86F902C2D62D60016F879 /* ArticleInteraction.swift */,
 			);
-			path = Interactions;
+			path = Interactor;
 			sourceTree = "<group>";
 		};
 		72E86F9F2C2E9B100016F879 /* Constants */ = {

@@ -9,16 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        TabView{
+       
             ArticleTabView()
                 .tabItem{
                     Label("news", systemImage: "newspaper")
                 }
-            SearchTabView()
-                .tabItem{
-                    Label("search", systemImage: "magnifyingglass")
-                }
-        }
+           
+        
     }
 }
 

@@ -9,9 +9,17 @@ import SwiftUI
 
 @main
 struct NewsAppApp: App {
+    @StateObject var router = AppRouterImplementation(window: UIWindow())
+
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+           .environmentObject(router)
+           .onAppear {
+               router.start()
+           }
         }
+        
     }
 }

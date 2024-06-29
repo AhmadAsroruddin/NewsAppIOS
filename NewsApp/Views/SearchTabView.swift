@@ -22,8 +22,7 @@ struct SearchTabView: View {
                 }
                 .navigationTitle("Search")
         }
-        .searchable(text: $articlePresenter.searchQuery, suggestions: {
-                   suggestionView})
+        .searchable(text: $articlePresenter.searchQuery)
         .onSubmit(of:.search, search)
         .onChange(of: articlePresenter.searchQuery){ newValue in
             if newValue.isEmpty{

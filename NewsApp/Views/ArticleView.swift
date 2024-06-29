@@ -48,24 +48,11 @@ struct ArticleView: View {
                     .lineLimit(3 )
                 
                 HStack{
+                    Spacer()
                     Text(article.captionText)
                         .foregroundColor(.secondary)
                         .font(.caption)
-                    Spacer()
-                    
-                    Button{
-                        
-                    }label: {
-                        Image(systemName: "bookmark")
-                    }
-                    .buttonStyle(.bordered)
-                    
-                    Button{
-                        
-                    }label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .buttonStyle(.bordered)
+                   
                 }
                 .padding(.top,5)
             }
